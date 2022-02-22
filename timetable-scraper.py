@@ -1,4 +1,5 @@
 from selenium import webdriver
+from bs4 import BeautifulSoup
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -11,6 +12,7 @@ import json
 
 class scraper:
 
+    #declaring constants
     USERNAME_ID = 'iwpSidebarPortlet|-1|null|tbUsername'
     PASSWORD_ID = 'iwpSidebarPortlet|-1|null|tbPassword'
     TABLE_CLASS = 'iwpTimetableGrid'
@@ -27,6 +29,7 @@ class scraper:
         driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
         driver.get('https://portal.stpiusx.nsw.edu.au/igloo/portal/')
 
+        #function to check whether the page is loaded
         def load_status(element_type,id_name):
             element_present = EC.presence_of_element_located((element_type, id_name))
             WebDriverWait(driver, 10).until(element_present)
@@ -43,20 +46,26 @@ class scraper:
 
             try:
                 load_status(By.CLASS_NAME, scraper.TABLE_CLASS)
-
                 timetable = driver.find_element(By.CLASS_NAME, scraper.TABLE_CLASS)
-                return (timetable.text)
+                
+                #converts html to json table
+                json_table = [[cell.text for cell in row("td")]
+                         for row in BeautifulSoup((timetable.get_attribute("outerHTML")),features="html.parser")("tr")]
+                return (json.dumps({element[0]:element[1:] for element in json_table}, indent=4))
+
                 driver.close()
 
             except:
+                #exits if page takes over 10 seconds to load
                 print("portal login timeout exception")
                 driver.close()
         except:
+            #exits if page takes over 10 seconds to load
             print("portal page load timeout exception")
             driver.close()
 
 INFO = scraper(info.creds()[0], info.creds()[1], info.creds()[2])
 
-table = scraper.get_timetable(INFO)
+raw_table = scraper.get_timetable(INFO)
 
-print(table)
+print(raw_table)
