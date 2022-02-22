@@ -36,7 +36,7 @@ class scraper:
 
         try:
             load_status(By.ID, scraper.USERNAME_ID)
-
+            
             username = driver.find_element(By.ID, scraper.USERNAME_ID)
             password = driver.find_element(By.ID, scraper.PASSWORD_ID)
 
