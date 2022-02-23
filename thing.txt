@@ -1,5 +1,0 @@
-json_table = [[cell.text for cell in row("td")]
-         for row in BeautifulSoup((timetable.get_attribute("outerHTML")),features="html.parser")("tr")]
-return (json.dumps({element[0]:element[1:] for element in json_table}, indent=4))
-                
-return (timetable.get_attribute("outerHTML"))
