@@ -10,7 +10,7 @@ import time
 import info
 import json
 
-class scraper:
+class timetable:
     #declaring constants
     USERNAME_ID = 'iwpSidebarPortlet|-1|null|tbUsername'
     PASSWORD_ID = 'iwpSidebarPortlet|-1|null|tbPassword'
@@ -21,7 +21,8 @@ class scraper:
         self.password = password
         self.directory = directory
 
-    def get_timetable(self):
+    #scrapes the data
+    def scrape(self):
         #sets parameters for chrome driver
         chrome_service = Service(self.directory)
         chrome_options = webdriver.ChromeOptions()
@@ -35,20 +36,20 @@ class scraper:
             WebDriverWait(driver, 10).until(element_present)
 
         try:
-            load_status(By.ID, scraper.USERNAME_ID)
+            load_status(By.ID, timetable.USERNAME_ID)
 
-            username = driver.find_element(By.ID, scraper.USERNAME_ID)
-            password = driver.find_element(By.ID, scraper.PASSWORD_ID)
+            username = driver.find_element(By.ID, timetable.USERNAME_ID)
+            password = driver.find_element(By.ID, timetable.PASSWORD_ID)
 
             username.send_keys(self.username)
             password.send_keys(self.password)
             password.send_keys(Keys.ENTER)
 
             try:
-                load_status(By.CLASS_NAME, scraper.TABLE_CLASS)
-                timetable = driver.find_element(By.CLASS_NAME, scraper.TABLE_CLASS)
+                load_status(By.CLASS_NAME, timetable.TABLE_CLASS)
+                raw_html = driver.find_element(By.CLASS_NAME, timetable.TABLE_CLASS)
 
-                return (timetable.get_attribute("outerHTML")) 
+                return (raw_html.get_attribute("outerHTML")) 
                 driver.close()
 
             except:
@@ -60,13 +61,20 @@ class scraper:
             print("portal page load timeout exception")
             driver.close()
 
-INFO = scraper(info.creds()[0], info.creds()[1], info.creds()[2])
-raw_html = scraper.get_timetable(INFO)
+    #converts raw html to json table
+    def format(raw_html):
+        raw_table = [[cell.text for cell in row("td")] for row in BeautifulSoup(raw_html,"lxml")("tr")]
 
-raw_table = [[cell.text for cell in row("td")] for row in BeautifulSoup(raw_html,"lxml")("tr")]
+        for i in range(len(raw_table)):
+            del raw_table[i][6],raw_table[i][2]
 
-for i in range(len(raw_table)):
-    del raw_table[i][6],raw_table[i][2]
+        return json.dumps(raw_table,indent=4)
 
-json_table = json.dumps(raw_table,indent=4)
+
+INFO = timetable(info.creds()[0], info.creds()[1], info.creds()[2])
+
+raw_html = timetable.scrape(INFO)
+
+json_table = timetable.format(raw_html)
+
 print(json_table)
