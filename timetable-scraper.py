@@ -61,11 +61,12 @@ class scraper:
             driver.close()
 
 INFO = scraper(info.creds()[0], info.creds()[1], info.creds()[2])
-
 raw_html = scraper.get_timetable(INFO)
 
 raw_table = [[cell.text for cell in row("td")] for row in BeautifulSoup(raw_html,"lxml")("tr")]
 
-json_table = json.dumps(raw_table,indent=4)
+for i in range(len(raw_table)):
+    del raw_table[i][6],raw_table[i][2]
 
+json_table = json.dumps(raw_table,indent=4)
 print(json_table)
