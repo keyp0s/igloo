@@ -11,7 +11,6 @@ import info
 import json
 
 class scraper:
-
     #declaring constants
     USERNAME_ID = 'iwpSidebarPortlet|-1|null|tbUsername'
     PASSWORD_ID = 'iwpSidebarPortlet|-1|null|tbPassword'
@@ -23,6 +22,7 @@ class scraper:
         self.directory = directory
 
     def get_timetable(self):
+        #sets parameters for chrome driver
         chrome_service = Service(self.directory)
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
@@ -36,7 +36,7 @@ class scraper:
 
         try:
             load_status(By.ID, scraper.USERNAME_ID)
-            
+
             username = driver.find_element(By.ID, scraper.USERNAME_ID)
             password = driver.find_element(By.ID, scraper.PASSWORD_ID)
 
@@ -47,12 +47,8 @@ class scraper:
             try:
                 load_status(By.CLASS_NAME, scraper.TABLE_CLASS)
                 timetable = driver.find_element(By.CLASS_NAME, scraper.TABLE_CLASS)
-                
-                #converts html to json table
-                json_table = [[cell.text for cell in row("td")]
-                         for row in BeautifulSoup((timetable.get_attribute("outerHTML")),features="html.parser")("tr")]
-                return (json.dumps({element[0]:element[1:] for element in json_table}, indent=4))
 
+                return (timetable.get_attribute("outerHTML")) 
                 driver.close()
 
             except:
@@ -66,6 +62,10 @@ class scraper:
 
 INFO = scraper(info.creds()[0], info.creds()[1], info.creds()[2])
 
-raw_table = scraper.get_timetable(INFO)
+raw_html = scraper.get_timetable(INFO)
 
-print(raw_table)
+raw_table = [[cell.text for cell in row("td")] for row in BeautifulSoup(raw_html,"lxml")("tr")]
+
+json_table = json.dumps(raw_table,indent=4)
+
+print(json_table)
