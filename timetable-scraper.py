@@ -71,10 +71,18 @@ class timetable:
         return json.dumps(raw_table,indent=4)
 
 
+#example code
+
+#load credentials from info.py file
 INFO = timetable(info.creds()[0], info.creds()[1], info.creds()[2])
 
+#or load credentials directly
+#INFO = timetable(<username>, <password>, <directory>)
+
+#scrape the timetable data
 raw_html = timetable.scrape(INFO)
 
+#convert to json
 json_table = timetable.format(raw_html)
 
 print(json_table)
