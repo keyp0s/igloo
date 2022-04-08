@@ -3,6 +3,9 @@
 a headless selenium bot to scrape the timetable of the civica igloo portal  
 displays content in JSON format
 
+<img src="src/timetable.png" height="300"/><img src="src/json.png" height="300"/>
+
+
 # documentation
 
 ### loading options
