@@ -14,14 +14,9 @@ class scrape:
     #declaring constants
     USERNAME_ID = 'iwpSidebarPortlet|-1|null|tbUsername'
     PASSWORD_ID = 'iwpSidebarPortlet|-1|null|tbPassword'
-    TABLE_ID = '__portlet|2|-306|dgMain'
-    ASSESSMENT_ID = '__portlet|2|-305|dgMain'
-    HOMEWORK_ID = '__portlet|1|-318|dgMain'
-
-    def __init__(self, username, password, directory):
-        self.username = username
-        self.password = password
-        self.directory = directory
+    TIMETABLE = '__portlet|2|-306|dgMain'
+    ASSESSMENT = '__portlet|2|-305|dgMain'
+    HOMEWORK = '__portlet|2|-318|dgMain'
 
     #scrapes the data
     def scraper(username, password, directory, element):
@@ -67,23 +62,29 @@ class scrape:
 
 #converts raw html to json table
 class format:
-    def __init__(self, raw):
-        self.raw = raw
-    def timetable(self):
-        raw_table = [[cell.text for cell in row("td")] for row in BeautifulSoup(self.raw,"lxml")("tr")]
+    def timetable(raw):
+        raw = [[cell.text for cell in row("td")] for row in BeautifulSoup(raw,"lxml")("tr")]
 
-        for i in range(len(raw_table)):
-            del raw_table[i][6],raw_table[i][2]
+        for i in range(len(raw)):
+            del raw[i][6],raw[i][2]
 
-        return json.dumps(raw_table,indent=4)
+        return json.dumps(raw)
 
-    def homework(self):
-        raw_table = [[cell.text for cell in row("td")] for row in BeautifulSoup(self.raw,"lxml")("tr")]
+    def homework(raw):
+        raw = [[cell.text for cell in row("td")] for row in BeautifulSoup(raw,"lxml")("tr")]
 
-        for i in range(len(raw_table)):
-            del raw_table[i][2]
+        for i in range(len(raw)):
+            del raw[i][3]
 
-        return json.dumps(raw_table,indent=4)
+        return json.dumps(raw)
+
+    def assessment(raw):
+        raw = [[cell.text for cell in row("td")] for row in BeautifulSoup(raw,"lxml")("tr")]
+        
+        for i in range(len(raw)):
+            del raw[i][4]
+
+        return json.dumps(raw)
 
 
 #example code
@@ -95,19 +96,18 @@ INFO = [info.creds()[0], info.creds()[1], info.creds()[2]]
 #INFO = [<username>, <password>, <directory>]
 
 #scrape the data from igloo
-raw_html = scrape.scraper(*INFO,[scrape.TABLE_ID,scrape.HOMEWORK_ID])
+raw_html = scrape.scraper(*INFO,[scrape.TIMETABLE,scrape.HOMEWORK,scrape.ASSESSMENT])
 
 #convert to json
 
 #convert timetable
-RAW_TIMETABLE = format(raw_html[0])
-timetable = format.timetable(RAW_TIMETABLE)
+timetable = format.timetable(raw_html[0])
 print(timetable)
 
 #convert homework
-RAW_HOMEWORK = format(raw_html[1])
-homework = format.homework(RAW_HOMEWORK)
+homework = format.homework(raw_html[1])
 print(homework)
 
-
-
+#convert homework
+assessment = format.assessment(raw_html[2])
+print(assessment)
