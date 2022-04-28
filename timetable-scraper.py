@@ -23,13 +23,8 @@ class scrape:
         self.password = password
         self.directory = directory
 
-    def timetable(self):
-        return self.scraper(self.username, self.password, self.directory, scrape.TABLE_ID)
-    def homework(self):
-        return self.scraper(self.username, self.password, self.directory, scrape.HOMEWORK_ID)
-
     #scrapes the data
-    def scraper(self, username, password, directory, element):
+    def scraper(username, password, directory, element):
         #sets parameters for chrome driver
         chrome_service = Service(directory)
         chrome_options = webdriver.ChromeOptions()
@@ -52,10 +47,13 @@ class scrape:
             password_id.send_keys(password)
             password_id.send_keys(Keys.ENTER)
             try:
-                load_status(By.ID, element)
-                raw_html = driver.find_element(By.ID, element)
+                items = []
+                for item in element:
+                    load_status(By.ID, item)
+                    raw_html = driver.find_element(By.ID, item)
+                    items.append(raw_html.get_attribute("outerHTML"))
 
-                return (raw_html.get_attribute("outerHTML")) 
+                return items
                 driver.close()
 
             except Exception as err:
@@ -91,26 +89,23 @@ class format:
 #example code
 
 #load credentials from info.py file
-INFO = scrape(info.creds()[0], info.creds()[1], info.creds()[2])
+INFO = [info.creds()[0], info.creds()[1], info.creds()[2]]
 
 #or load credentials directly
-#INFO = timetable(<username>, <password>, <directory>)
+#INFO = [<username>, <password>, <directory>]
 
-#scrape the timetable data
-raw_timetable = scrape.timetable(INFO)
-
-#scrape the homework data
-raw_homework = scrape.homework(INFO)
+#scrape the data from igloo
+raw_html = scrape.scraper(*INFO,[scrape.TABLE_ID,scrape.HOMEWORK_ID])
 
 #convert to json
 
 #convert timetable
-RAW_TIMETABLE = format(raw_timetable)
+RAW_TIMETABLE = format(raw_html[0])
 timetable = format.timetable(RAW_TIMETABLE)
 print(timetable)
 
 #convert homework
-RAW_HOMEWORK = format(raw_homework)
+RAW_HOMEWORK = format(raw_html[1])
 homework = format.homework(RAW_HOMEWORK)
 print(homework)
 
