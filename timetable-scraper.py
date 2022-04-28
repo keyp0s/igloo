@@ -1,5 +1,5 @@
-from selenium import webdriver
 from bs4 import BeautifulSoup
+from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -10,7 +10,7 @@ import time
 import info
 import json
 
-class scrape:
+class igloo:
     #declaring constants
     USERNAME_ID = 'iwpSidebarPortlet|-1|null|tbUsername'
     PASSWORD_ID = 'iwpSidebarPortlet|-1|null|tbPassword'
@@ -19,7 +19,7 @@ class scrape:
     HOMEWORK = '__portlet|2|-318|dgMain'
 
     #scrapes the data
-    def scraper(username, password, directory, element):
+    def scrape(username, password, directory, element):
         #sets parameters for chrome driver
         chrome_service = Service(directory)
         chrome_options = webdriver.ChromeOptions()
@@ -33,10 +33,10 @@ class scrape:
             WebDriverWait(driver, 10).until(element_present)
 
         try:
-            load_status(By.ID, scrape.USERNAME_ID)
+            load_status(By.ID, igloo.USERNAME_ID)
 
-            username_id = driver.find_element(By.ID, scrape.USERNAME_ID)
-            password_id = driver.find_element(By.ID, scrape.PASSWORD_ID)
+            username_id = driver.find_element(By.ID, igloo.USERNAME_ID)
+            password_id = driver.find_element(By.ID, igloo.PASSWORD_ID)
             
             username_id.send_keys(username)
             password_id.send_keys(password)
@@ -60,8 +60,7 @@ class scrape:
             print("possible page load timeout, raised exception:",err)
             driver.close()
 
-#converts raw html to json table
-class format:
+    #converts raw html to json table
     def timetable(raw):
         raw = [[cell.text for cell in row("td")] for row in BeautifulSoup(raw,"lxml")("tr")]
 
@@ -95,19 +94,19 @@ INFO = [info.creds()[0], info.creds()[1], info.creds()[2]]
 #or load credentials directly
 #INFO = [<username>, <password>, <directory>]
 
-#scrape the data from igloo
-raw_html = scrape.scraper(*INFO,[scrape.TIMETABLE,scrape.HOMEWORK,scrape.ASSESSMENT])
+#igloo the data from igloo
+raw_html = igloo.scrape(*INFO,[igloo.TIMETABLE,igloo.HOMEWORK,igloo.ASSESSMENT])
 
 #convert to json
 
 #convert timetable
-timetable = format.timetable(raw_html[0])
+timetable = igloo.timetable(raw_html[0])
 print(timetable)
 
 #convert homework
-homework = format.homework(raw_html[1])
+homework = igloo.homework(raw_html[1])
 print(homework)
 
-#convert homework
-assessment = format.assessment(raw_html[2])
+#convert assessment
+assessment = igloo.assessment(raw_html[2])
 print(assessment)
