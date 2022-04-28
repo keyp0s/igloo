@@ -1,4 +1,4 @@
-# civica-timetable-scraper
+# igloo portal timetable scraper
 
 a headless selenium bot to scrape the timetable of the civica igloo portal  
 displays content in JSON format
