@@ -18,7 +18,7 @@ def creds():
     return [
             '<username>',
             '<password>',
-            '<directory to chromedriver>',
+            '<directory_to_chromedriver>',
            ]
  ```
  and change your code to ```timetable(info.creds()[0], info.creds()[1], info.creds()[2])```
@@ -27,9 +27,9 @@ def creds():
  
  ### running scraper
  
- to scrape the website ```timetable.scrape(options variable)```
+ to scrape the website ```timetable.scrape(options_variable)```
  
- then optionally convert the raw html into json ```timetable.format(raw html)```
+ then optionally convert the raw html into json ```timetable.format(raw_html)```
  
  ## example code
 ```
