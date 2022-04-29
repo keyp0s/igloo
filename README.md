@@ -8,12 +8,14 @@ displays content in JSON format
 
 # documentation
 
+## prerequisites
+
 ### loading options
 
-to load options ```timetable(username, password, directory to chromedriver)```
+to load options ```INFO = [<username>, <password>, <directory>]```
 
 or alternatively create a file called **info.py** in the same directory with these contents  
-```
+```python
 def creds():
     return [
             '<username>',
@@ -21,23 +23,38 @@ def creds():
             '<directory_to_chromedriver>',
            ]
  ```
- and change your code to ```timetable(info.creds()[0], info.creds()[1], info.creds()[2])```
+ and change your code to ```INFO = [info.creds()[0], info.creds()[1], info.creds()[2]]```
  
  this is to store your credentials
  
  ### running scraper
  
- to scrape the website ```timetable.scrape(options_variable)```
+ to scrape the website ```igloo.scrape(*INFO,[igloo.TIMETABLE,igloo.HOMEWORK,igloo.ASSESSMENT])```
  
- then optionally convert the raw html into json ```timetable.format(raw_html)```
+ then optionally convert the raw html into json ```igloo.<element_name>(raw_html)```
  
  ## example code
-```
-options = timetable(username, password, directory to chromedriver)
+```python
+#load credentials from info.py file
+INFO = [info.creds()[0], info.creds()[1], info.creds()[2]]
 
-raw_html = timetable.scrape(options)
+#or load credentials directly
+#INFO = [<username>, <password>, <directory>]
 
-json_table = timetable.format(raw_html)
+#igloo the data from igloo
+raw_html = igloo.scrape(*INFO,[igloo.TIMETABLE,igloo.HOMEWORK,igloo.ASSESSMENT])
 
-print(json_table)
+#convert to json
+
+#convert timetable
+timetable = igloo.timetable(raw_html[0])
+print(timetable)
+
+#convert homework
+homework = igloo.homework(raw_html[1])
+print(homework)
+
+#convert assessment
+assessment = igloo.assessment(raw_html[2])
+print(assessment)
 ```
