@@ -97,7 +97,7 @@ INFO = [info.creds()[0], info.creds()[1], info.creds()[2]]
 #Igloo the data from Igloo
 raw_html = Igloo.scrape(*INFO,[Igloo.TIMETABLE,Igloo.HOMEWORK,Igloo.ASSESSMENT])
 
-#convert to json
+#convert raw html to json
 
 #convert timetable
 timetable = Igloo.timetable(raw_html[0])
