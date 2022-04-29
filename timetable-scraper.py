@@ -10,7 +10,7 @@ import time
 import info
 import json
 
-class igloo:
+class Igloo:
     #declaring constants
     USERNAME_ID = 'iwpSidebarPortlet|-1|null|tbUsername'
     PASSWORD_ID = 'iwpSidebarPortlet|-1|null|tbPassword'
@@ -25,7 +25,7 @@ class igloo:
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
         driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
-        driver.get('https://portal.stpiusx.nsw.edu.au/igloo/portal/')
+        driver.get('https://portal.stpiusx.nsw.edu.au/Igloo/portal/')
         
         #function to check whether the page is loaded
         def load_status(element_type,id_name):
@@ -33,10 +33,10 @@ class igloo:
             WebDriverWait(driver, 10).until(element_present)
 
         try:
-            load_status(By.ID, igloo.USERNAME_ID)
+            load_status(By.ID, Igloo.USERNAME_ID)
 
-            username_id = driver.find_element(By.ID, igloo.USERNAME_ID)
-            password_id = driver.find_element(By.ID, igloo.PASSWORD_ID)
+            username_id = driver.find_element(By.ID, Igloo.USERNAME_ID)
+            password_id = driver.find_element(By.ID, Igloo.PASSWORD_ID)
             
             username_id.send_keys(username)
             password_id.send_keys(password)
@@ -94,19 +94,19 @@ INFO = [info.creds()[0], info.creds()[1], info.creds()[2]]
 #or load credentials directly
 #INFO = [<username>, <password>, <directory>]
 
-#igloo the data from igloo
-raw_html = igloo.scrape(*INFO,[igloo.TIMETABLE,igloo.HOMEWORK,igloo.ASSESSMENT])
+#Igloo the data from Igloo
+raw_html = Igloo.scrape(*INFO,[Igloo.TIMETABLE,Igloo.HOMEWORK,Igloo.ASSESSMENT])
 
 #convert to json
 
 #convert timetable
-timetable = igloo.timetable(raw_html[0])
+timetable = Igloo.timetable(raw_html[0])
 print(timetable)
 
 #convert homework
-homework = igloo.homework(raw_html[1])
+homework = Igloo.homework(raw_html[1])
 print(homework)
 
 #convert assessment
-assessment = igloo.assessment(raw_html[2])
+assessment = Igloo.assessment(raw_html[2])
 print(assessment)
