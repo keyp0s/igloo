@@ -14,7 +14,7 @@ class scrape:
     #declaring constants
     USERNAME_ID = 'iwpSidebarPortlet|-1|null|tbUsername'
     PASSWORD_ID = 'iwpSidebarPortlet|-1|null|tbPassword'
-    TABLE_CLASS = 'iwpTimetableGrid'
+    TABLE_ID = '__portlet|2|-306|dgMain'
     ASSESSMENT_ID = '__portlet|2|-305|dgMain'
     HOMEWORK_ID = '__portlet|1|-318|dgMain'
 
@@ -24,7 +24,9 @@ class scrape:
         self.directory = directory
 
     def timetable(self):
-        return self.scraper(self.username, self.password, self.directory, scrape.TABLE_CLASS)
+        return self.scraper(self.username, self.password, self.directory, scrape.TABLE_ID)
+    def homework(self):
+        return self.scraper(self.username, self.password, self.directory, scrape.HOMEWORK_ID)
 
     #scrapes the data
     def scraper(self, username, password, directory, element):
@@ -50,8 +52,8 @@ class scrape:
             password_id.send_keys(password)
             password_id.send_keys(Keys.ENTER)
             try:
-                load_status(By.CLASS_NAME, element)
-                raw_html = driver.find_element(By.CLASS_NAME, element)
+                load_status(By.ID, element)
+                raw_html = driver.find_element(By.ID, element)
 
                 return (raw_html.get_attribute("outerHTML")) 
                 driver.close()
@@ -65,17 +67,25 @@ class scrape:
             print("possible page load timeout, raised exception:",err)
             driver.close()
 
-    #converts raw html to json table
+#converts raw html to json table
 class format:
     def __init__(self, raw):
         self.raw = raw
     def timetable(self):
-            raw_table = [[cell.text for cell in row("td")] for row in BeautifulSoup(self.raw,"lxml")("tr")]
+        raw_table = [[cell.text for cell in row("td")] for row in BeautifulSoup(self.raw,"lxml")("tr")]
 
-            for i in range(len(raw_table)):
-                del raw_table[i][6],raw_table[i][2]
+        for i in range(len(raw_table)):
+            del raw_table[i][6],raw_table[i][2]
 
-            return json.dumps(raw_table,indent=4)
+        return json.dumps(raw_table,indent=4)
+
+    def homework(self):
+        raw_table = [[cell.text for cell in row("td")] for row in BeautifulSoup(self.raw,"lxml")("tr")]
+
+        for i in range(len(raw_table)):
+            del raw_table[i][2]
+
+        return json.dumps(raw_table,indent=4)
 
 
 #example code
@@ -87,10 +97,22 @@ INFO = scrape(info.creds()[0], info.creds()[1], info.creds()[2])
 #INFO = timetable(<username>, <password>, <directory>)
 
 #scrape the timetable data
-raw_html = scrape.timetable(INFO)
+raw_timetable = scrape.timetable(INFO)
+
+#scrape the homework data
+raw_homework = scrape.homework(INFO)
 
 #convert to json
-RAW = format(raw_html)
-json_table = format.timetable(RAW)
 
-print(json_table)
+#convert timetable
+RAW_TIMETABLE = format(raw_timetable)
+timetable = format.timetable(RAW_TIMETABLE)
+print(timetable)
+
+#convert homework
+RAW_HOMEWORK = format(raw_homework)
+homework = format.homework(RAW_HOMEWORK)
+print(homework)
+
+
+
